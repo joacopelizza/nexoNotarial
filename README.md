@@ -52,7 +52,7 @@ Se activó correctamente si el prompt empieza con `(venv)`.
 
 pip install -r requirements.txt
 
-Sobre el lockfile: `requirements.txt` declara las dependencias directas del proyecto (Flask, python-dotenv). El archivo `requirements-lock.txt` fija además las versiones exactas de las dependencias transitivas (las que Flask instala por su cuenta), para garantizar un entorno idéntico byte a byte entre integrantes. Se regenera después de instalar con `pip freeze > requirements-lock.txt`.
+Sobre el lockfile: `requirements.txt` declara las dependencias directas del proyecto (Flask, python-dotenv). El archivo `requirements-lock.txt` fija además las versiones exactas de las dependencias transitivas (las que Flask instala por su cuenta), para garantizar un entorno idéntico entre integrantes.
 
 **Copiar el archivo de configuración de ejemplo:**
 
