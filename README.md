@@ -11,18 +11,48 @@ Este proyecto busca centralizar esos datos en un sistema simple. El diseño
 detallado de las entidades (clientes, escrituras, trámites) y su lógica se
 va a desarrollar en las próximas etapas de la materia.
 
+## Integrantes
+
+- Pelizza Joaquin - JoaquinPelizza
+- Moore Andy - andymoore01
+- Fedigatti Augusto - Agusfedredhunter
+- Urdampilleta Iñaki - iniakiur
+
+## Tecnología elegida
+
+- **Lenguaje:** Python 3.11+
+- **Framework web:** Flask
+- **Gestión de dependencias:** `pip` + `requirements.txt`
+- **Base de datos:** a definir en la próxima etapa (SQLite es la opción más
+  probable, por no requerir instalación de un servidor aparte)
+
 ## Cómo instalar dependencias
 
 # 1. Clonar el repositorio
 git clone https://github.com/joacopelizza/nexoNotarial.git
-cd escribania-app
+cd nexoNotorial
 
 # 2. Crear el entorno virtual (igual en cualquier sistema operativo)
 python -m venv venv
 
+**Activar el entorno virtual** (el comando cambia según el sistema operativo):
+
+# Windows (PowerShell)
+.\venv\Scripts\Activate.ps1
+
+# Windows (CMD, sin PowerShell)
+venv\Scripts\activate.bat
+
+# Mac / Linux
+source venv/bin/activate
+
+Se activó correctamente si el prompt empieza con `(venv)`.
+
 **Instalar dependencias:**
 
 pip install -r requirements.txt
+
+Sobre el lockfile: `requirements.txt` declara las dependencias directas del proyecto (Flask, python-dotenv). El archivo `requirements-lock.txt` fija además las versiones exactas de las dependencias transitivas (las que Flask instala por su cuenta), para garantizar un entorno idéntico byte a byte entre integrantes. Se regenera después de instalar con `pip freeze > requirements-lock.txt`.
 
 **Copiar el archivo de configuración de ejemplo:**
 
