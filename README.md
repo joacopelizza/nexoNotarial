@@ -14,7 +14,7 @@ va a desarrollar en las próximas etapas de la materia.
 ## Cómo instalar dependencias
 
 # 1. Clonar el repositorio
-git clone <url-del-repositorio>
+git clone https://github.com/joacopelizza/nexoNotarial.git
 cd escribania-app
 
 # 2. Crear el entorno virtual (igual en cualquier sistema operativo)
