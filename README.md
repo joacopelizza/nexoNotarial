@@ -69,6 +69,12 @@ python app.py
 La aplicación queda disponible en `http://127.0.0.1:5000`. Al entrar
 debería mostrar un mensaje confirmando que el entorno está funcionando.
 
+## Fase actual del sistema.
+
+Gen A-1
+- Generación: Alpha
+- Versión: 1
+
 ## Estado actual y pendientes conocidos
 
 - [x] Repositorio, README y entorno inicial reproducible.
