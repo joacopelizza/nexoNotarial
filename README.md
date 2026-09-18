@@ -20,7 +20,7 @@ va a desarrollar en las próximas etapas de la materia.
 
 ## Tecnología elegida
 
-- **Lenguaje:** Python 3.11+
+- **Lenguaje:** Python 3.11+ / cambiando a Typescript
 - **Framework web:** Flask
 - **Gestión de dependencias:** `pip` + `requirements.txt`
 - **Base de datos:** a definir en la próxima etapa (SQLite es la opción más
