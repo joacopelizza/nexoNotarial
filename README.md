@@ -15,14 +15,14 @@ El trabajo sigue incompleto: faltan operaciones y formularios de edición en var
 
 ## Puesta en marcha local con Docker
 
-1. Copiá `.env.example` como `.env` y reemplazá `DB_PASSWORD`, `SESSION_SECRET` y `INITIAL_PASSWORD` por valores propios. `SESSION_SECRET` debe tener al menos 32 caracteres y la contraseña inicial al menos 12.
-2. Desde la raíz del repositorio, ejecutá:
+1. Desde PowerShell, en la raíz del repositorio, ejecutá el script:
 
    ```powershell
-   docker compose up --build
+   .\scripts\dev-up.ps1
    ```
 
-3. Abrí `http://localhost:8080`. El primer inicio crea la cuenta configurada en `INITIAL_USERNAME` y `INITIAL_EMAIL`.
+   Si todavía no existe `.env`, el script lo crea desde `.env.example`, genera claves aleatorias para el entorno local y muestra una vez la contraseña inicial. En ejecuciones siguientes conserva `.env` y levanta los servicios con `docker compose up --build`.
+2. Abrí `http://localhost:8080`. El primer inicio crea la cuenta configurada en `INITIAL_USERNAME` y `INITIAL_EMAIL`.
 
 Los documentos y adjuntos se guardan en volúmenes locales de Docker. `docker compose down` conserva los datos. `docker compose down -v` los elimina; no lo uses si necesitás conservarlos.
 
