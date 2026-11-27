@@ -4,7 +4,7 @@ import {
   documentStates,
   isPossibleDuplicate,
   normalizeDuplicateKey,
-} from '../src/domain';
+} from '../src/domain/document';
 
 const validDocument = {
   titulo: 'Poder general',

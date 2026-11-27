@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from './db';
+import { sequelize } from '../database/connection';
 
 type IdAttrs = { id: string };
 type Creation<T extends IdAttrs> = Partial<T>;
@@ -156,7 +156,7 @@ Priority.init(
   { sequelize, tableName: 'prioridades', underscored: true },
 );
 
-import { documentStates } from './domain';
+import { documentStates } from '../domain/document';
 export type DocumentState = (typeof documentStates)[number];
 export class DocumentRecord extends Model<
   IdAttrs & {

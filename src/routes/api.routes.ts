@@ -12,9 +12,9 @@ import {
   Person,
   Priority,
   Tag,
-} from './models';
-import { httpError } from './errors';
-import { documentInputSchema, documentStates, isPossibleDuplicate } from './domain';
+} from '../models';
+import { httpError } from '../middleware/error-handler';
+import { documentInputSchema, documentStates, isPossibleDuplicate } from '../domain/document';
 
 export const apiRouter = Router();
 
@@ -232,7 +232,7 @@ apiRouter.put('/prioridades', async (req, res, next) => {
       .parse(req.body);
     if (new Set(input.map((x) => x.id)).size !== 5 || new Set(input.map((x) => x.orden)).size !== 5)
       throw httpError(400, 'Deben enviarse los cinco niveles con órdenes únicos.');
-    const { sequelize } = await import('./db');
+    const { sequelize } = await import('../database/connection');
     await sequelize.transaction(async (transaction) => {
       const existing = await Priority.findAll({ attributes: ['id'], transaction });
       if (
@@ -400,7 +400,7 @@ apiRouter.post('/documentos', async (req, res, next) => {
     const duplicates = duplicateCandidates.filter((existing) =>
       isPossibleDuplicate(input, existing),
     );
-    const { sequelize } = await import('./db');
+    const { sequelize } = await import('../database/connection');
     const { personas, categorias, etiquetas, fechaEmision, ...fields } = input;
     const row = await sequelize.transaction(async (transaction) => {
       const created = await DocumentRecord.create(
@@ -444,7 +444,7 @@ apiRouter.put('/documentos/:id', async (req, res, next) => {
       input.etiquetas,
     );
     const { personas, categorias, etiquetas, fechaEmision, ...fields } = input;
-    const { sequelize } = await import('./db');
+    const { sequelize } = await import('../database/connection');
     await sequelize.transaction(async (transaction) => {
       await row.update(
         {

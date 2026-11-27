@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from './db';
+import { sequelize } from './connection';
 
 export async function migrate(): Promise<void> {
   const name = '001_initial.sql';

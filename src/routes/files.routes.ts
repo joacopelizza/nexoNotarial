@@ -3,9 +3,9 @@ import multer from 'multer';
 import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { Attachment, DocumentRecord } from './models';
-import { config } from './config';
-import { httpError } from './errors';
+import { Attachment, DocumentRecord } from '../models';
+import { config } from '../config';
+import { httpError } from '../middleware/error-handler';
 
 export const filesRouter = Router();
 const allowed = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);

@@ -11,7 +11,7 @@
     "test": "vitest run",
     "lint": "eslint .",
     "format:check": "prettier --check .",
-    "format:write": "prettier --write \"src/**/*.ts\" \"web/**/*.ts\" \"web/**/*.tsx\" \"web/**/*.css\" \"test/**/*.ts\" \"docs/*.md\" README.md package.json docker-compose.yml postman/*.json eslint.config.mjs tsconfig.json web/index.html",
+    "format:write": "prettier --write \"src/**/*.ts\" \"web/**/*.ts\" \"web/**/*.tsx\" \"web/**/*.css\" \"tests/**/*.ts\" \"docs/**/*.md\" README.md package.json docker-compose.yml postman/*.json eslint.config.mjs tsconfig.json web/index.html",
     "dev:web": "vite --config web/vite.config.ts",
     "build:web": "vite build --config web/vite.config.ts"
   },

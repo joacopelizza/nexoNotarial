@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { documentYear } from '../src/domain';
+import { documentYear } from '../src/domain/document';
 
 describe('organización temporal', () => {
   it('deriva el año desde la fecha registrada y no desde un campo manual', () => {

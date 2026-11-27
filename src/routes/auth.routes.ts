@@ -3,10 +3,10 @@ import bcrypt from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
 import nodemailer from 'nodemailer';
 import { Op } from 'sequelize';
-import { User } from './models';
-import { config, mailConfigured } from './config';
-import { issueCsrf, requireAuth, requireCsrf } from './middleware';
-import { httpError } from './errors';
+import { User } from '../models';
+import { config, mailConfigured } from '../config';
+import { issueCsrf, requireAuth, requireCsrf } from '../middleware/security';
+import { httpError } from '../middleware/error-handler';
 import { z } from 'zod';
 
 export const authRouter = Router();
