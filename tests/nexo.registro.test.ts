@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { documentInputSchema } from '../src/domain';
+import { documentInputSchema } from '../src/domain/document';
 
 describe('alta documental', () => {
   const base = {

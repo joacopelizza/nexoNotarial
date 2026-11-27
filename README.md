@@ -65,11 +65,19 @@ La recuperación devuelve un error `503` si no están configuradas todas las var
 
 ## Arquitectura y datos
 
-- `web/`: React, TypeScript y Vite.
-- `src/`: API Express, modelos Sequelize, rutas, validaciones, autenticación y archivos.
+- `web/`: aplicación React y configuración de Vite.
+- `web/src/styles/`: estilos globales y de detalle.
+- `src/`: backend Express.
+- `src/config/`: configuración de entorno.
+- `src/database/`: conexión y ejecución de migraciones.
+- `src/domain/`: reglas y validaciones del dominio.
+- `src/middleware/`: seguridad y manejo centralizado de errores.
+- `src/models/`: modelos Sequelize.
+- `src/routes/`: rutas de API para documentos, autenticación y archivos.
 - `db/migrations/`: esquema SQL versionado e idempotente.
-- `test/`: pruebas unitarias de validaciones y reglas de dominio.
+- `tests/`: pruebas automatizadas de validaciones, reglas y respuestas HTTP.
 - `docker/`: inicialización/configuración del entorno.
+- `legacy/`: prototipo Flask anterior y sus dependencias Python.
 
 Las decisiones de diseño y sus trade-offs están en [`docs/decisiones-diseno.md`](docs/decisiones-diseno.md). Los cinco puntos funcionales pendientes están en [`docs/decisiones-pendientes.md`](docs/decisiones-pendientes.md). El backlog académico está en [`docs/backlog.md`](docs/backlog.md).
 

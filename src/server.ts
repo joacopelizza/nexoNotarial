@@ -6,14 +6,14 @@ import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
 import connectSessionSequelize from 'connect-session-sequelize';
 import { config } from './config';
-import { sequelize } from './db';
-import { migrate } from './migrate';
+import { sequelize } from './database/connection';
+import { migrate } from './database/migrate';
 import { User, Priority } from './models';
-import { authRouter } from './auth.routes';
-import { apiRouter } from './api.routes';
-import { filesRouter } from './files.routes';
-import { errorHandler } from './errors';
-import { requireAuth, requireCsrf } from './middleware';
+import { authRouter } from './routes/auth.routes';
+import { apiRouter } from './routes/api.routes';
+import { filesRouter } from './routes/files.routes';
+import { errorHandler } from './middleware/error-handler';
+import { requireAuth, requireCsrf } from './middleware/security';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 const sessionStore = new SequelizeStore({

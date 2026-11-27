@@ -20,12 +20,12 @@ Se creó una API TypeScript separada por rutas, modelos, middleware y configurac
 
 ## Evidencia y trade-offs
 
-- `src/domain.ts`: estados fijos, DTO/validación de documento y detección de posibles duplicados.
-- `src/api.routes.ts`: operaciones y consultas con Sequelize, integridad y transacciones al persistir relaciones.
-- `src/models.ts` y `db/migrations/001_initial.sql`: relaciones, claves foráneas, cascada de legajo a documentos y tablas de unión.
-- `src/auth.routes.ts`, `src/middleware.ts`: contraseña con bcrypt, sesión persistida, cookie protegida y CSRF.
-- `src/files.routes.ts`: nombres aleatorios, comprobación de firma MIME y vista previa autenticada.
-- `test/nexo.registro.test.ts`, `test/nexo.calendario.test.ts`: reglas de entrada y derivación de año.
+- `src/domain/document.ts`: estados fijos, DTO/validación de documento y detección de posibles duplicados.
+- `src/routes/api.routes.ts`: operaciones y consultas con Sequelize, integridad y transacciones al persistir relaciones.
+- `src/models/index.ts` y `db/migrations/001_initial.sql`: relaciones, claves foráneas, cascada de legajo a documentos y tablas de unión.
+- `src/routes/auth.routes.ts`, `src/middleware/security.ts`: contraseña con bcrypt, sesión persistida, cookie protegida y CSRF.
+- `src/routes/files.routes.ts`: nombres aleatorios, comprobación de firma MIME y vista previa autenticada.
+- `tests/nexo.registro.test.ts`, `tests/nexo.calendario.test.ts`: reglas de entrada y derivación de año.
 
 El costo de migrar es mayor que mantener Flask: se agregan dependencias, servicios y configuración de base. El beneficio es persistencia, tipado estricto y una arquitectura alineada con la evaluación. La integración y los escenarios de eliminación todavía requieren pruebas reales con PostgreSQL.
 

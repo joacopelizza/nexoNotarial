@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import './details.css';
+import './styles/details.css';
 
 const sections = [
   'Inicio',
