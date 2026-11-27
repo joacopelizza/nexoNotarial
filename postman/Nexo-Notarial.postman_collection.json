@@ -1,0 +1,359 @@
+{
+  "info": {
+    "name": "Nexo Notarial API",
+    "description": "Requests de autenticación y gestión documental. Definí variables locales; no guardar credenciales reales en la colección.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "csrfToken", "value": "" },
+    { "key": "legajoId", "value": "" },
+    { "key": "documentoId", "value": "" },
+    { "key": "prioridadId", "value": "" },
+    { "key": "personaId", "value": "" },
+    { "key": "categoriaId", "value": "" },
+    { "key": "etiquetaId", "value": "" },
+    { "key": "archivoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "Login por usuario o correo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) pm.collectionVariables.set('csrfToken', pm.response.json().token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{username}}\",\"password\":\"{{password}}\"}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        { "name": "Sesión actual", "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" } },
+        {
+          "name": "Token CSRF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.collectionVariables.set('csrfToken', pm.response.json().token);"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": { "method": "GET", "url": "{{baseUrl}}/auth/csrf" }
+        },
+        {
+          "name": "Solicitar recuperación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"{{email}}\"}" },
+            "url": "{{baseUrl}}/auth/recuperacion"
+          }
+        },
+        {
+          "name": "Restablecer contraseña con token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"token\":\"{{recoveryToken}}\",\"password\":\"{{newPassword}}\"}"
+            },
+            "url": "{{baseUrl}}/auth/restablecer"
+          }
+        },
+        {
+          "name": "Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Legajos",
+      "item": [
+        { "name": "Listar legajos", "request": { "method": "GET", "url": "{{baseUrl}}/legajos" } },
+        {
+          "name": "Crear legajo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"numero\":\"2026-001\"}" },
+            "url": "{{baseUrl}}/legajos"
+          }
+        },
+        {
+          "name": "Cambiar número",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"numero\":\"2026-002\"}" },
+            "url": "{{baseUrl}}/legajos/{{legajoId}}"
+          }
+        },
+        {
+          "name": "Eliminar legajo y documentos",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/legajos/{{legajoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documentos",
+      "item": [
+        {
+          "name": "Buscar y paginar documentos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/documentos?q=&page=1&pageSize=25&sort=fechaIncorporacion&direction=DESC"
+          }
+        },
+        {
+          "name": "Consultar estados",
+          "request": { "method": "GET", "url": "{{baseUrl}}/estados" }
+        },
+        {
+          "name": "Crear documento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"titulo\":\"Poder general\",\"tipo\":\"Poder\",\"legajoId\":\"{{legajoId}}\",\"prioridadId\":\"{{prioridadId}}\",\"estado\":\"Pendiente\"}"
+            },
+            "url": "{{baseUrl}}/documentos"
+          }
+        },
+        {
+          "name": "Consultar documento",
+          "request": { "method": "GET", "url": "{{baseUrl}}/documentos/{{documentoId}}" }
+        },
+        {
+          "name": "Comprobar posibles duplicados",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/documentos/posibles-duplicados?titulo=Poder%20general&numero=PG-1"
+          }
+        },
+        {
+          "name": "Cambiar estado",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"estado\":\"En revisión\"}" },
+            "url": "{{baseUrl}}/documentos/{{documentoId}}"
+          }
+        },
+        {
+          "name": "Eliminar documento",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/documentos/{{documentoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Personas",
+      "item": [
+        {
+          "name": "Listar personas",
+          "request": { "method": "GET", "url": "{{baseUrl}}/personas" }
+        },
+        {
+          "name": "Crear persona",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Nombre de ejemplo\",\"identificacion\":null}"
+            },
+            "url": "{{baseUrl}}/personas"
+          }
+        },
+        {
+          "name": "Actualizar persona",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Nombre actualizado\",\"identificacion\":null}"
+            },
+            "url": "{{baseUrl}}/personas/{{personaId}}"
+          }
+        },
+        {
+          "name": "Eliminar persona",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/personas/{{personaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorías y etiquetas",
+      "item": [
+        {
+          "name": "Listar categorías",
+          "request": { "method": "GET", "url": "{{baseUrl}}/categorias" }
+        },
+        {
+          "name": "Crear categoría",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"nombre\":\"Escrituras\",\"parentId\":null}" },
+            "url": "{{baseUrl}}/categorias"
+          }
+        },
+        {
+          "name": "Listar etiquetas",
+          "request": { "method": "GET", "url": "{{baseUrl}}/etiquetas" }
+        },
+        {
+          "name": "Crear etiqueta",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"nombre\":\"Urgente\"}" },
+            "url": "{{baseUrl}}/etiquetas"
+          }
+        },
+        {
+          "name": "Eliminar etiqueta",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/etiquetas/{{etiquetaId}}"
+          }
+        },
+        {
+          "name": "Crear subcategoría",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Inmobiliario\",\"parentId\":\"{{categoriaId}}\"}"
+            },
+            "url": "{{baseUrl}}/categorias"
+          }
+        },
+        {
+          "name": "Eliminar categoría",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/categorias/{{categoriaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prioridades",
+      "item": [
+        {
+          "name": "Consultar cinco prioridades",
+          "request": { "method": "GET", "url": "{{baseUrl}}/prioridades" }
+        },
+        {
+          "name": "Renombrar y reordenar los cinco niveles",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\"id\":\"{{priority1}}\",\"nombre\":\"Urgente\",\"orden\":1},{\"id\":\"{{priority2}}\",\"nombre\":\"Alta\",\"orden\":2},{\"id\":\"{{priority3}}\",\"nombre\":\"Media\",\"orden\":3},{\"id\":\"{{priority4}}\",\"nombre\":\"Baja\",\"orden\":4},{\"id\":\"{{priority5}}\",\"nombre\":\"Sin prioridad\",\"orden\":5}]"
+            },
+            "url": "{{baseUrl}}/prioridades"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Archivos",
+      "item": [
+        {
+          "name": "Subir archivo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "archivo", "type": "file", "src": "" }]
+            },
+            "url": "{{baseUrl}}/archivos/documentos/{{documentoId}}/archivos"
+          }
+        },
+        {
+          "name": "Vista previa",
+          "request": { "method": "GET", "url": "{{baseUrl}}/archivos/{{archivoId}}/vista-previa" }
+        },
+        {
+          "name": "Eliminar archivo",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }],
+            "url": "{{baseUrl}}/archivos/{{archivoId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

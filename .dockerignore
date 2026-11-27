@@ -1,0 +1,10 @@
+.git
+.env
+node_modules
+dist
+web-dist
+coverage
+uploads
+venv
+__pycache__
+*.pyc

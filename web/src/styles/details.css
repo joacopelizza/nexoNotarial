@@ -1,0 +1,74 @@
+.file-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #edf1ed;
+  padding: 8px 0;
+  font-size: 12px;
+}
+.file-row > div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.upload-form {
+  display: flex;
+  align-items: end;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.upload-form label {
+  display: grid;
+  gap: 7px;
+  flex: 1;
+  font-size: 11px;
+  color: #59685f;
+}
+.upload-form input {
+  font-size: 11px;
+  max-width: 100%;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -4px 0 14px;
+}
+
+.filter-bar select,
+.filter-bar input {
+  min-height: 34px;
+  max-width: 190px;
+  border: 1px solid #e1e8e2;
+  border-radius: 7px;
+  background: #fff;
+  color: #526157;
+  padding: 6px 9px;
+  font-size: 11px;
+}
+
+.row-delete {
+  margin-left: 4px;
+  opacity: 0;
+}
+
+tr:hover .row-delete,
+.row-delete:focus-visible {
+  opacity: 1;
+}
+
+.auth-toggle {
+  justify-self: center;
+}
+
+.success {
+  margin: 0;
+  border-radius: 6px;
+  padding: 10px;
+  color: #2c6841;
+  background: #eaf5ed;
+  font-size: 12px;
+}

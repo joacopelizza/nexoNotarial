@@ -1,86 +1,90 @@
-# Sistema de Organización de Datos de Escribanía
+# Nexo Notarial
 
-## Qué problema resuelve
+Aplicación web para organizar documentos digitales de una escribanía. Este repositorio partía de un prototipo Flask que guardaba actas en memoria. La versión actual inicia una migración hacia TypeScript, Express, Sequelize y PostgreSQL, con una interfaz React.
 
-Las escribanías suelen manejar la información de clientes, actos notariales
-(escrituras, poderes, testamentos, hipotecas, etc.) y el estado de sus
-trámites en planillas sueltas o documentos duplicados, lo que dificulta
-encontrar información actualizada y confiable.
+## Estado del proyecto
 
-Este proyecto busca centralizar esos datos en un sistema simple. El diseño
-detallado de las entidades (clientes, escrituras, trámites) y su lógica se
-va a desarrollar en las próximas etapas de la materia.
+Hay una base full stack ejecutable en preparación: autenticación de usuario único, sesiones persistentes, migración PostgreSQL inicial, CRUD de legajos, personas, categorías, prioridades y documentos, búsqueda paginada, asociación de personas/categorías/etiquetas desde API y gestión autenticada de archivos. La interfaz incluye inicio de sesión y las seis secciones requeridas.
 
-## Integrantes
+El trabajo sigue incompleto: faltan operaciones y formularios de edición en varias pantallas, la recuperación de contraseña necesita SMTP real, falta una batería de integración con PostgreSQL y la verificación final de Docker depende del entorno. La lista detallada está en [`docs/estado-y-pendientes.md`](docs/estado-y-pendientes.md). No se afirma que el proyecto esté listo para producción.
 
-- Pelizza Joaquin - JoaquinPelizza
-- Moore Andy - andymoore01
-- Fedigatti Augusto - Agusfedredhunter
-- Urdampilleta Iñaki - iniakiur
+## Requisitos
 
-## Tecnología elegida
+- Node.js 20 o superior y npm.
+- Docker Desktop con Docker Compose v2 para levantar PostgreSQL y los servicios web.
 
-- **Lenguaje:** Python 3.11+ / cambiando a Typescript
-- **Framework web:** Flask
-- **Gestión de dependencias:** `pip` + `requirements.txt`
-- **Base de datos:** a definir en la próxima etapa (SQLite es la opción más
-  probable, por no requerir instalación de un servidor aparte)
+## Puesta en marcha local con Docker
 
-## Cómo instalar dependencias
+1. Desde PowerShell, en la raíz del repositorio, ejecutá el script:
 
-# 1. Clonar el repositorio
-git clone https://github.com/joacopelizza/nexoNotarial.git
-cd nexoNotorial
+   ```powershell
+   .\scripts\dev-up.ps1
+   ```
 
-# 2. Crear el entorno virtual (igual en cualquier sistema operativo)
-python -m venv venv
+   Si todavía no existe `.env`, el script lo crea desde `.env.example`, genera claves aleatorias para el entorno local y muestra una vez la contraseña inicial. En ejecuciones siguientes conserva `.env` y levanta los servicios con `docker compose up --build`.
+2. Abrí `http://localhost:8080`. El primer inicio crea la cuenta configurada en `INITIAL_USERNAME` y `INITIAL_EMAIL`.
 
-**Activar el entorno virtual** (el comando cambia según el sistema operativo):
+Los documentos y adjuntos se guardan en volúmenes locales de Docker. `docker compose down` conserva los datos. `docker compose down -v` los elimina; no lo uses si necesitás conservarlos.
 
-# Windows (PowerShell)
-.\venv\Scripts\Activate.ps1
+## Desarrollo sin contenedores
 
-# Windows (CMD, sin PowerShell)
-venv\Scripts\activate.bat
+1. Instalá PostgreSQL y creá una base vacía.
+2. Copiá `.env.example` a `.env` y ajustá `DATABASE_URL` y las variables iniciales.
+3. Instalá dependencias y arrancá la API y la interfaz en terminales separadas:
 
-# Mac / Linux
-source venv/bin/activate
+   ```bash
+   npm ci
+   npm run dev
+   npm run dev:web
+   ```
 
-Se activó correctamente si el prompt empieza con `(venv)`.
+La API escucha en el puerto 3000 y Vite en el 5173. Para el modo local, configurá `FRONTEND_ORIGIN=http://localhost:5173` en `.env`. La migración SQL inicial se ejecuta al iniciar la API. Para producción no se usa `sync({ alter: true })`.
 
-**Instalar dependencias:**
+## Comandos
 
-pip install -r requirements.txt
+| Comando                | Uso                                       |
+| ---------------------- | ----------------------------------------- |
+| `npm run dev`          | API en modo desarrollo                    |
+| `npm run dev:web`      | Interfaz React/Vite                       |
+| `npm run typecheck`    | Verifica tipos TypeScript del backend     |
+| `npm run build`        | Compila el backend                        |
+| `npm run build:web`    | Genera el frontend                        |
+| `npm test`             | Ejecuta pruebas automatizadas disponibles |
+| `npm run lint`         | Analiza TypeScript con ESLint             |
+| `npm run format:check` | Comprueba formato con Prettier            |
 
-Sobre el lockfile: `requirements.txt` declara las dependencias directas del proyecto (Flask, python-dotenv). El archivo `requirements-lock.txt` fija además las versiones exactas de las dependencias transitivas (las que Flask instala por su cuenta), para garantizar un entorno idéntico entre integrantes.
+## API
 
-**Copiar el archivo de configuración de ejemplo:**
+La API usa sesiones HTTP con cookie `HttpOnly`, `SameSite=Strict`, token CSRF para mutaciones y límite de intentos en rutas de autenticación. `GET /api/salud` es el healthcheck público. El resto requiere sesión.
 
-# Windows (PowerShell o CMD)
-copy .env.example .env
+Principales rutas: `/api/auth/*`, `/api/legajos`, `/api/documentos`, `/api/personas`, `/api/categorias`, `/api/etiquetas`, `/api/prioridades` y `/api/archivos`. La colección importable está en [`postman/Nexo-Notarial.postman_collection.json`](postman/Nexo-Notarial.postman_collection.json).
 
-# Mac / Linux
-cp .env.example .env
+Los ejemplos de request/response y el uso de CSRF están en [`docs/api.md`](docs/api.md).
 
-## Cómo ejecutar el proyecto
+La recuperación devuelve un error `503` si no están configuradas todas las variables SMTP. No declara enviado un correo cuando no existe proveedor. Las vistas previas de archivos requieren sesión y los tipos permitidos son PDF, JPG, PNG y WebP con validación de firma y tamaño.
 
-python app.py
+## Arquitectura y datos
 
-La aplicación queda disponible en `http://127.0.0.1:5000`. Al entrar
-debería mostrar un mensaje confirmando que el entorno está funcionando.
+- `web/`: aplicación React y configuración de Vite.
+- `web/src/styles/`: estilos globales y de detalle.
+- `src/`: backend Express.
+- `src/config/`: configuración de entorno.
+- `src/database/`: conexión y ejecución de migraciones.
+- `src/domain/`: reglas y validaciones del dominio.
+- `src/middleware/`: seguridad y manejo centralizado de errores.
+- `src/models/`: modelos Sequelize.
+- `src/routes/`: rutas de API para documentos, autenticación y archivos.
+- `db/migrations/`: esquema SQL versionado e idempotente.
+- `tests/`: pruebas automatizadas de validaciones, reglas y respuestas HTTP.
+- `docker/`: inicialización/configuración del entorno.
+- `legacy/`: prototipo Flask anterior y sus dependencias Python.
 
-## Fase actual del sistema.
+Las decisiones de diseño y sus trade-offs están en [`docs/decisiones-diseno.md`](docs/decisiones-diseno.md). Los cinco puntos funcionales pendientes están en [`docs/decisiones-pendientes.md`](docs/decisiones-pendientes.md). El backlog académico está en [`docs/backlog.md`](docs/backlog.md).
 
-Gen A-1
-- Generación: Alpha
-- Versión: 1
+La guía de preparación para Render/Vercel/Netlify, almacenamiento persistente y variables de producción está en [`docs/deploy.md`](docs/deploy.md).
 
-## Estado actual y pendientes conocidos
+## Seguridad y límites
 
-- [x] Repositorio, README y entorno inicial reproducible.
-- [x] Servidor mínimo funcionando (Flask + configuración por `.env`).
-- [ ] Diseño del modelo de datos (Cliente, Escritura, Trámite).
-- [ ] Endpoints de alta, modificación y consulta.
-- [ ] Persistencia en base de datos.
+No guardes `.env` ni credenciales en Git. La configuración de ejemplo es solo para desarrollo. Antes de un despliegue público, configurá secretos, SMTP, dominio HTTPS, CORS, persistencia de archivos adecuada al proveedor y políticas de acceso del servicio PostgreSQL. No se implementaron copias de seguridad, múltiples usuarios, OCR, búsqueda dentro de archivos, reportes ni historial de actividad.
 
-Este README se irá actualizando a medida que avance el proyecto.
+Las pruebas existentes no reemplazan una revisión de seguridad ni validan la integración completa. Consultá `docs/estado-y-pendientes.md` para resultados comprobados y asuntos sin verificar.

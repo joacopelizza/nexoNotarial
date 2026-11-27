@@ -7,6 +7,12 @@ __pycache__/
 *.pyo
 
 .env
+node_modules/
+dist/
+web-dist/
+coverage/
+uploads/*
+!uploads/.gitkeep
 
 .vscode/
 .idea/

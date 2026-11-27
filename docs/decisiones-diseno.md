@@ -1,48 +1,38 @@
-# Documentación de Decisiones de Diseño - Taller II
+# Decisiones de diseño y evidencia
 
-## 1. Código Analizado
-**Módulo:** `app.py`  
-**Funcionalidad:** Proceso de Gestión de Actas Notariales (Creación y Listado).  
+## Código analizado
 
-**Detalle de lo analizado:**
-Nos enfocamos en cómo viaja la información desde que el usuario envía una solicitud hasta que el acta se guarda. Analizamos tres partes clave:
-- **La ruta de Flask (`/actas` POST):** Analizamos cómo recibe los datos en formato JSON y cómo responde al usuario.
-- **La clase `ActaService`:** Analizamos la lógica para validar que los datos estén completos y cómo se arma el acta (generando el ID único y la fecha).
-- **La clase `ActaRepository`:** Analizamos cómo se separó la forma de guardar los datos (en este caso, una lista en memoria) del resto del programa.
+La versión inicial concentraba el flujo de alta y consulta de actas en `app.py`: rutas Flask, validación mínima, creación del objeto y un repositorio en memoria. Los archivos `test/nexo.registro.test.ts` y `test/nexo.calendario.test.ts` estaban vacíos.
 
-Al analizar esto, nos aseguramos de que cada parte haga solo lo que le corresponde, evitando que el código se mezcle y sea difícil de entender.
+## Diagnóstico
 
-## 2. Diagnóstico Técnico
-Al revisar el flujo, analizamos qué pasaría si implementábamos todo de manera simple (poniendo toda la lógica dentro de la ruta de Flask).
+El repositorio desacoplaba el servicio de la lista mediante `ActaRepository`, pero la persistencia se perdía al reiniciar y no había una forma de probar el comportamiento real. El secreto de Flask aceptaba el valor por defecto `dev`; además, no existían autenticación, validación de estructura, integridad referencial ni gestión de archivos.
 
-**Riesgos detectados:**
-- **Mucho trabajo para una sola función:** La ruta de Flask terminaría haciendo todo (validar, crear el acta y guardarla). Esto crea lo que se conoce como un *God Object*, una función que hace demasiadas cosas y es difícil de mantener.
-- **Dependencia total (Acoplamiento):** Si el día de mañana queremos cambiar la forma en que guardamos las actas, tendríamos que modificar la ruta de Flask. Esto hace que el sistema sea frágil y propenso a errores.
-- **Dificultad para probar:** No podríamos probar la lógica de creación de actas sin tener que ejecutar todo el servidor de Flask y hacer peticiones reales, lo que hace que encontrar errores sea más lento.
+## Alternativas
 
-## 3. Alternativas Consideradas
-Consideramos dos caminos posibles:
+- Conservar Flask y agregar SQLite: cambio pequeño, pero se apartaba de la decisión tecnológica del proyecto (TypeScript, Express, Sequelize y PostgreSQL).
+- Migrar a servicios separados y múltiples repositorios: permitiría despliegues independientes, aunque agregaría complejidad sin necesidad académica inmediata.
+- Mantener un backend Express/TypeScript y frontend React en un repositorio, con PostgreSQL y migraciones SQL: alternativa elegida por alineación con el prompt y despliegue local simple.
 
-1.  **Hacerlo simple (Modelo de Scripting):** Poner toda la lógica en la ruta.
-    - *Ventaja:* Se termina más rápido.
-    - *Desventaja:* Se genera "deuda técnica" (problemas que habrá que arreglar después). El código se vuelve rígido y difícil de cambiar.
-2.  **Hacerlo organizado (Arquitectura en Capas - Elegida):** Dividir el programa en Presentación, Negocio y Datos.
-    - *Ventaja:* El código queda limpio, organizado y es muy fácil de cambiar o ampliar.
-    - *Desventaja:* Hay que escribir un poco más de código al principio para crear las clases.
+## Decisión
 
-## 4. Decisión de Diseño y Fundamentación
-Decidimos usar una arquitectura desacoplada basada en estos principios:
+Se creó una API TypeScript separada por rutas, modelos, middleware y configuración; el frontend usa React/TypeScript. Las relaciones y restricciones viven en una migración versionada. No se usa `sync({ alter: true })`. La capa de validación de documentos se comparte con pruebas puras para comprobar reglas sin depender de una base levantada.
 
-- **Patrón Repository & DIP:** Creamos una interfaz `ActaRepository`. Así, el `ActaService` no sabe *cómo* se guardan los datos, solo sabe que puede llamarlos. Esto aplica el **Principio de Inversión de Dependencias (DIP)** y permite cambiar la base de datos sin tocar el resto del código.
-- **Capa de Servicio (SRP):** Pusimos la lógica de negocio en `ActaService`. Así, la ruta de Flask solo se encarga de recibir y enviar respuestas, mientras que el servicio se encarga de que el acta esté bien creada. Esto cumple con el **Principio de Responsabilidad Única (SRP)**.
-- **Diseño para el Futuro:** Organizamos el código para que cada clase tenga una sola razón para cambiar, evitando que un cambio pequeño rompa todo el sistema.
+## Evidencia y trade-offs
 
-## 5. Evidencia y Trade-offs
+- `src/domain/document.ts`: estados fijos, DTO/validación de documento y detección de posibles duplicados.
+- `src/routes/api.routes.ts`: operaciones y consultas con Sequelize, integridad y transacciones al persistir relaciones.
+- `src/models/index.ts` y `db/migrations/001_initial.sql`: relaciones, claves foráneas, cascada de legajo a documentos y tablas de unión.
+- `src/routes/auth.routes.ts`, `src/middleware/security.ts`: contraseña con bcrypt, sesión persistida, cookie protegida y CSRF.
+- `src/routes/files.routes.ts`: nombres aleatorios, comprobación de firma MIME y vista previa autenticada.
+- `tests/nexo.registro.test.ts`, `tests/nexo.calendario.test.ts`: reglas de entrada y derivación de año.
 
-### Evidencia en el Código:
-- **Rutas livianas:** La ruta de Flask ahora es muy corta; solo llama al servicio y maneja el error si algo sale mal.
-- **Guardado flexible:** Gracias a la clase abstracta, podemos cambiar la lista en memoria por una base de datos real sin cambiar la lógica de negocio.
+El costo de migrar es mayor que mantener Flask: se agregan dependencias, servicios y configuración de base. El beneficio es persistencia, tipado estricto y una arquitectura alineada con la evaluación. La integración y los escenarios de eliminación todavía requieren pruebas reales con PostgreSQL.
 
-### Análisis de Costo/Beneficio (Trade-offs):
-- **Costo:** Tuvimos que crear más clases y archivos al principio.
-- **Beneficio:** Logramos un código con **Alta Cohesión** (cada parte hace lo suyo) y **Bajo Acoplamiento** (las partes no dependen rígidamente entre sí). Esto hace que el sistema sea profesional, fácil de testear y muy sencillo de mantener.
+## Registro del análisis presentado para Taller II
+
+El documento previo evaluó `app.py` y eligió mantener una arquitectura en capas: ruta Flask para HTTP, `ActaService` para negocio y `ActaRepository` para persistencia. Comparó esa opción con concentrar todo en la ruta y señaló el costo inicial de crear más clases frente a mejor cohesión y menor acoplamiento. Esa reflexión sigue siendo evidencia del análisis del equipo.
+
+### Aclaración técnica incorporada en esta revisión
+
+La afirmación original de que la lógica de creación no podía probarse sin ejecutar Flask era demasiado amplia: `ActaService` recibe un `ActaRepository` y podía probarse directamente usando `MemoryActaRepository`. Lo que faltaba eran pruebas automatizadas y cobertura de las rutas HTTP. Las pruebas nuevas comprueban reglas de dominio y algunas respuestas HTTP; todavía falta ejecutar integración contra PostgreSQL.
