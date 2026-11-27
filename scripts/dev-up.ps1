@@ -23,7 +23,12 @@ if (-not (Test-Path -LiteralPath $envPath)) {
 
   $envText = Get-Content -LiteralPath $examplePath -Raw
   $initialPassword = New-Secret 18
-  $envText = $envText.Replace('local-only-change-before-deploy', (New-Secret))
+  $databasePassword = New-Secret
+  $envText = $envText.Replace(
+    'postgres://nexo:local-only-change-before-deploy@localhost:5432/nexo',
+    "postgres://nexo:${databasePassword}@localhost:5432/nexo"
+  )
+  $envText = $envText.Replace('local-only-change-before-deploy', $databasePassword)
   $envText = $envText.Replace('replace-with-a-random-secret-at-least-32-characters', (New-Secret))
   $envText = $envText.Replace('replace-before-first-start', $initialPassword)
   [System.IO.File]::WriteAllText($envPath, $envText, [System.Text.UTF8Encoding]::new($false))
