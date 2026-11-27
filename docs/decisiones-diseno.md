@@ -35,4 +35,4 @@ El documento previo evaluó `app.py` y eligió mantener una arquitectura en capa
 
 ### Aclaración técnica incorporada en esta revisión
 
-La afirmación original de que la lógica de creación no podía probarse sin ejecutar Flask era demasiado amplia: `ActaService` recibe un `ActaRepository` y podía probarse directamente usando `MemoryActaRepository`. Lo que faltaba eran pruebas automatizadas y cobertura de las rutas HTTP. Las pruebas nuevas comprueban reglas de dominio y algunas respuestas HTTP; todavía falta ejecutar integración contra PostgreSQL.
+La afirmación original de que la lógica de creación no podía probarse sin ejecutar Flask era demasiado amplia: `ActaService` recibe un `ActaRepository` y podía probarse directamente usando `MemoryActaRepository`. Lo que faltaba eran pruebas automatizadas y cobertura de las rutas HTTP. Las pruebas nuevas comprueban reglas de dominio y respuestas HTTP.
